@@ -29,11 +29,9 @@ default_template = Conversation(
 )
 
 
-model = GPTQModel(model_name="anon8231489123/vicuna-13b-GPTQ-4bit-128g", device="cpu", wbits=4, groupsize=128)
+model = GPTQModel(model_name="anon8231489123/vicuna-13b-GPTQ-4bit-128g", device="cuda", wbits=4, groupsize=128)
 my_conv = default_template.copy()
 my_conv = model.inference({"prompt": "Tell me the difference between a human and an artificial intelligence assistant.",
-                        "conversation": my_conv,
-                        "max_new_tokens": 512,
-                        "temperature":0.01})
+                        "conversation": my_conv})
 
 print(my_conv.last_message)

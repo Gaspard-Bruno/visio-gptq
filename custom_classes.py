@@ -7,8 +7,10 @@ from typing import List
 from pathlib import Path
 import transformers
 from transformers import AutoConfig, AutoModelForCausalLM
-from modelutils import find_layers
-from quant import make_quant
+import sys
+sys.path.insert(0, str(Path("GPTQ-for-LLaMa")))
+from modelutils import find_layers # type: ignore
+from quant import make_quant # type: ignore
 
 
 def load_quant(model, checkpoint, wbits, groupsize=-1, faster_kernel=False, exclude_layers=['lm_head'], kernel_switch_threshold=128):
