@@ -1,1 +1,1 @@
-# visio_gptq
+# visio-gptq
