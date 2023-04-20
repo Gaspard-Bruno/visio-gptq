@@ -1,4 +1,7 @@
-from custom_classes import Conversation, GPTQModel, SeparatorStyle
+
+
+from src.conversation import Conversation, SeparatorStyle
+from src.model import GPTQModel
 
 
 default_template = Conversation(
@@ -28,10 +31,24 @@ default_template = Conversation(
     sep="###",
 )
 
+context_template = Conversation(
+    system="A chat between a curious human and an artificial intelligence assistant."
+           "The assistant gives helpful, detailed, and polite answers to the human's questions, based only on the context provided by the human."
+           "The context is represeted by the tag <context> and end on </context>.",
+    roles=["Human", "Assistant"],
+    messages=[
+        ["Human", "<context>The monkeys like bananas</context> Please tell my what monkeys like."],
+        ["Assistant", "Sure, monkeys like bananas"]
+    ],
+    offset=2,
+    sep_style=SeparatorStyle.SINGLE,
+    sep="###",
+)
+
 
 model = GPTQModel(model_name="anon8231489123/vicuna-13b-GPTQ-4bit-128g", device="cuda", wbits=4, groupsize=128)
-my_conv = default_template.copy()
-my_conv = model.inference({"prompt": "Tell me the difference between a human and an artificial intelligence assistant.",
+my_conv = context_template.copy()
+my_conv = model.inference({"prompt": "Fred likes to to travel and go to the GYM, Please tell my what fred do.",
                         "conversation": my_conv})
 
 print(my_conv.last_message)
