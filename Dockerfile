@@ -1,25 +1,20 @@
-FROM nvidia/cuda:11.7.0-devel-ubuntu22.04
-RUN useradd -ms /bin/bash appuser
+FROM nvidia/cuda:11.4.2-devel-ubuntu20.04
 
-RUN apt update
-RUN apt install git python3-pip -y && pip3 install -U pip
+RUN useradd -ms /bin/bash app
+USER app
+WORKDIR /home/app
 
-RUN git clone https://github.com/Gaspard-Bruno/visio-gptq.git
-RUN chown -R appuser ./visio-gptq/*
+USER root
+RUN apt update && apt install -y git python3-pip
+RUN git clone --recursive https://github.com/Gaspard-Bruno/visio-gptq.git
 
-WORKDIR /visio-gptq
-ENTRYPOINT [ "./install.sh" ]
+RUN ln -sf /usr/bin/python3 /usr/bin/python \
+    && ln -sf /usr/bin/pip3 /usr/bin/pip
 
-# RUN git config --global url.“https://***REMOVED***:@github.com/“.insteadOf “https://github.com/”
-# RUN git clone https://github.com/Gaspard-Bruno/visio-gptq.git
+RUN chown -R app /home/app/visio-gptq
+WORKDIR /home/app/visio-gptq
 
-# WORKDIR /visio-gptq
-# COPY requirements.txt local_requirements.txt
-# RUN pip install -U pip && pip install --no-cache-dir --upgrade -r local_requirements.txt
+USER app
+RUN chmod +x install.sh
 
-# RUN pip install -r requirements.txt
-
-# COPY ./* .
-# RUN chown -R appuser /visio-gptq
-
-# ENTRYPOINT [ "./install.sh" ]
+CMD ["./install.sh"]
