@@ -81,7 +81,7 @@ def sanitize_model_and_branch_names(model, branch):
 
 def get_download_links_from_huggingface(model, branch, text_only=False):
     base = "https://huggingface.co"
-    page = f"/api/models/{model}/tree/{branch}?cursor="
+    page = f"/api/models/{model}/tree/{branch}"
     cursor = b""
 
     links = []
@@ -93,14 +93,17 @@ def get_download_links_from_huggingface(model, branch, text_only=False):
     has_safetensors = False
     is_lora = False
     while True:
-        content = requests.get(f"{base}{page}{cursor.decode()}").content
+        url = f"{base}{page}" + (f"?cursor={cursor.decode()}" if cursor else "")
+        r = requests.get(url)
+        r.raise_for_status()
+        content = r.content
 
-        dict = json.loads(content)
-        if len(dict) == 0:
+        data = json.loads(content)
+        if len(data) == 0:
             break
+        for i in range(len(data)):
 
-        for i in range(len(dict)):
-            fname = dict[i]['path']
+            fname = data[i]['path']
             if not is_lora and fname.endswith(('adapter_config.json', 'adapter_model.bin')):
                 is_lora = True
 
@@ -112,8 +115,8 @@ def get_download_links_from_huggingface(model, branch, text_only=False):
             is_text = re.match(".*\.(txt|json|py|md)", fname) or is_tokenizer
 
             if any((is_pytorch, is_safetensors, is_pt, is_ggml, is_tokenizer, is_text)):
-                if 'lfs' in dict[i]:
-                    sha256.append([fname, dict[i]['lfs']['oid']])
+                if 'lfs' in data[i]:
+                    sha256.append([fname, data[i]['lfs']['oid']])
                 if is_text:
                     links.append(f"https://huggingface.co/{model}/resolve/{branch}/{fname}")
                     classifications.append('text')
@@ -133,7 +136,7 @@ def get_download_links_from_huggingface(model, branch, text_only=False):
                         has_ggml = True
                         classifications.append('ggml')
 
-        cursor = base64.b64encode(f'{{"file_name":"{dict[-1]["path"]}"}}'.encode()) + b':50'
+        cursor = base64.b64encode(f'{{"file_name":"{data[-1]["path"]}"}}'.encode()) + b':50'
         cursor = base64.b64encode(cursor)
         cursor = cursor.replace(b'=', b'%3D')
 

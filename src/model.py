@@ -15,7 +15,7 @@ class GPTQModel:
         self.num_gpus = kwargs.get("num_gpus", 1) if self.device == "cuda" else 0
         self.wbits = kwargs.get("wbits", 0)
         self.groupsize = kwargs.get("groupsize", 128)
-        
+
         tokenizer, model, context_len = self.__load_model(model_name=self.model_name, device=self.device, num_gpus=self.num_gpus, wbits=self.wbits, groupsize=self.groupsize)
         self.model = model
         self.context_len = context_len
@@ -23,7 +23,7 @@ class GPTQModel:
 
 
     def __load_model(self, model_name, device, num_gpus, wbits, groupsize, max_gpu_memory="13GiB", **kwargs):
-        
+
         if device == "cpu":
             kwargs = {}
         elif device == "cuda":
@@ -41,7 +41,7 @@ class GPTQModel:
             raise ValueError(f"Invalid device: {device}")
 
         tokenizer = AutoTokenizer.from_pretrained(model_name)
-        
+
         if wbits > 0:
             model = load_quantized(model_name, wbits=wbits, groupsize=groupsize)
         else:
@@ -60,7 +60,7 @@ class GPTQModel:
             context_len = 2048
 
         return tokenizer, model, context_len
-    
+
     @torch.inference_mode()
     def __generate_stream(self, prompt:str, **kwargs):
 
@@ -69,7 +69,7 @@ class GPTQModel:
         max_new_tokens = int(kwargs.get("max_new_tokens") or 512)
         context_len = int(kwargs.get("context_len") or 2048)
         stream_interval = int(kwargs.get("stream_interval") or 2)
-        stop_str = kwargs.get("stop") or "###"
+        stop_array = kwargs.get("stop") or ["###"]
 
         input_ids = self.tokenizer(prompt).input_ids
         output_ids = list(input_ids)
@@ -111,10 +111,12 @@ class GPTQModel:
 
             if i % stream_interval == 0 or i == max_new_tokens - 1 or stopped:
                 output = self.tokenizer.decode(output_ids, skip_special_tokens=True)
-                pos = output.rfind(stop_str, l_prompt)
-                if pos != -1:
-                    output = output[:pos]
-                    stopped = True
+                for stop_str in stop_array:
+                    pos = output.rfind(stop_str, l_prompt)
+                    if pos != -1:
+                        output = output[:pos]
+                        stopped = True
+                        break
                 yield output
 
             if stopped:
@@ -127,7 +129,7 @@ class GPTQModel:
         if conversation is not None:
             if not isinstance(conversation, Conversation):
                 raise ValueError("conv_template is not a ConversationTemplate")
-          
+
             conversation.append_message(conversation.roles[0], prompt)
             conversation.append_message(conversation.roles[1], None)
             new_prompt = conversation.get_prompt()
