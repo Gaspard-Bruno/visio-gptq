@@ -1,9 +1,8 @@
 from transformers import AutoTokenizer, AutoModelForCausalLM
 import torch
 from transformers import  AutoModelForCausalLM
-from src.conversation import Conversation, SeparatorStyle
-
-from src.quad import load_quantized
+from visio_gptq.conversation import Conversation, SeparatorStyle
+from visio_gptq.quad import load_quantized
 
 
 class GPTQModel:

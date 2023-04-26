@@ -4,10 +4,9 @@ import os
 from pathlib import Path
 import transformers
 from transformers import AutoConfig, AutoModelForCausalLM
-import sys
-sys.path.insert(0, str(Path(f"{sys.path[0]}/GPTQ-for-LLaMa")))
-from modelutils import find_layers # type: ignore
-from quant import make_quant # type: ignore
+
+from visio_gptq import find_layers # type: ignore
+from visio_gptq import make_quant # type: ignore
 
 
 def load_quant(model, checkpoint, wbits, groupsize=-1, faster_kernel=False, exclude_layers=['lm_head'], kernel_switch_threshold=128):
