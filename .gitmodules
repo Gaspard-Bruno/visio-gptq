@@ -1,3 +1,3 @@
 [submodule "src/GPTQ-for-LLaMa"]
 	path = src/GPTQ-for-LLaMa
-	url = https://github.com/oobabooga/GPTQ-for-LLaMa.git
+	url = https://github.com/qwopqwop200/GPTQ-for-LLaMa
