@@ -7,7 +7,7 @@ CURRENT_PATH = Path(__file__)
 
 
 
-def load_quantized(model_name, wbits=4, groupsize=128):
+def load_quantized(model_name, wbits=4, groupsize=128, device="cuda"):
     if not os.path.exists(model_name):
         new_model_name = model_name.replace('/', '_')
         path_to_model = Path(f'{CURRENT_PATH.parent}/models/{new_model_name}')
@@ -34,6 +34,6 @@ def load_quantized(model_name, wbits=4, groupsize=128):
         print("Could not find the quantized model in .pt or .safetensors format, exiting...")
         exit()
 
-    model = load_quant(str(path_to_model), str(pt_path), wbits, groupsize)
+    model = load_quant(str(path_to_model), str(pt_path), wbits, groupsize, device=device)
 
     return model
