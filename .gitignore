@@ -128,3 +128,6 @@ dmypy.json
 # Pyre type checker
 .pyre/
 src/visio_gptq/models/**/
+src/visio_gptq/GPTQ-for-LLaMa/build/*
+src/visio_gptq/GPTQ-for-LLaMa/dist/*
+src/visio_gptq/GPTQ-for-LLaMa/quant_cuda.egg-info/*
