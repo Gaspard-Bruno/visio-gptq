@@ -39,7 +39,7 @@ class GPTQModel:
         else:
             raise ValueError(f"Invalid device: {device}")
 
-        tokenizer = AutoTokenizer.from_pretrained(model_name)
+        tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=wbits==0)
 
         if wbits > 0:
             model = load_quantized(model_name, wbits=wbits, groupsize=groupsize)
@@ -51,8 +51,9 @@ class GPTQModel:
             )
 
         if num_gpus == 1:
-            model.cuda()
+            model.to(torch.device("cuda:0"))
 
+        model.eval()
         if hasattr(model.config, "max_sequence_length"):
             context_len = model.config.max_sequence_length
         else:
