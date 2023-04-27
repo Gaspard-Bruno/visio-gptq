@@ -1,3 +1,0 @@
-[submodule "src/visio_gptq/GPTQ-for-LLaMa"]
-	path = src/visio_gptq/GPTQ-for-LLaMa
-	url = https://github.com/qwopqwop200/GPTQ-for-LLaMa
