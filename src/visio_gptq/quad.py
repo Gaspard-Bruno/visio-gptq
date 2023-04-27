@@ -1,13 +1,14 @@
 from transformers import AutoModelForCausalLM
 import torch
 import os
+
 from pathlib import Path
 import transformers
 from transformers import AutoConfig, AutoModelForCausalLM
-
+import visio_gptq.download_model as downloader
 from visio_gptq import find_layers # type: ignore
 from visio_gptq import make_quant # type: ignore
-
+CURRENT_PATH = Path(__file__)
 
 def load_quant(model, checkpoint, wbits, groupsize=-1, faster_kernel=False, exclude_layers=['lm_head'], kernel_switch_threshold=128):
     config = AutoConfig.from_pretrained(model)
@@ -30,7 +31,7 @@ def load_quant(model, checkpoint, wbits, groupsize=-1, faster_kernel=False, excl
     make_quant(model, layers, wbits, groupsize, faster=faster_kernel, kernel_switch_threshold=kernel_switch_threshold)
 
     del layers
-    
+
     print('Loading model ...')
     if checkpoint.endswith('.safetensors'):
         from safetensors.torch import load_file as safe_load
@@ -45,8 +46,17 @@ def load_quant(model, checkpoint, wbits, groupsize=-1, faster_kernel=False, excl
 
 def load_quantized(model_name, wbits=4, groupsize=128, threshold=128):
     if not os.path.exists(model_name):
-        model_name = model_name.replace('/', '_')
-        path_to_model = Path(f'./models/{model_name}')
+        new_model_name = model_name.replace('/', '_')
+        path_to_model = Path(f'{CURRENT_PATH.parent}/models/{new_model_name}')
+        if not os.path.exists(path_to_model):
+            # Cleaning up the model/branch names
+            model, branch = downloader.sanitize_model_and_branch_names(model_name, 'main')
+             # Getting the download links from Hugging Face
+            links, sha256, is_lora = downloader.get_download_links_from_huggingface(model, branch)
+            # Getting the output folder
+            #path_to_model = downloader.get_output_folder(model, branch, is_lora)
+            os.mkdir(path_to_model)
+            downloader.download_model_files(model,branch=branch, links=links, sha256=sha256, output_folder=path_to_model)
     else:
         path_to_model = Path(model_name)
     found_pts = list(path_to_model.glob("*.pt"))

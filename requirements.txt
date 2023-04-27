@@ -1,0 +1,2 @@
+protobuf==3.20
+transformers @ git+https://github.com/huggingface/transformers.git@c612628045822f909020f7eb6784c79700813eda
