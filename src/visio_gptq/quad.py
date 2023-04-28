@@ -6,17 +6,13 @@ from visio_gptq import load_quant # type: ignore
 CURRENT_PATH = Path(__file__)
 
 
-
 def load_quantized(model_name, wbits=4, groupsize=128, device="cuda"):
     if not os.path.exists(model_name):
         new_model_name = model_name.replace('/', '_')
         path_to_model = Path(f'{CURRENT_PATH.parent}/models/{new_model_name}')
         if not os.path.exists(path_to_model):
-            # Cleaning up the model/branch names
             model, branch = downloader.sanitize_model_and_branch_names(model_name, 'main')
-             # Getting the download links from Hugging Face
             links, sha256, _ = downloader.get_download_links_from_huggingface(model, branch)
-            # Getting the output folder
             os.mkdir(path_to_model)
             downloader.download_model_files(model,branch=branch, links=links, sha256=sha256, output_folder=path_to_model)
     else:
@@ -25,9 +21,9 @@ def load_quantized(model_name, wbits=4, groupsize=128, device="cuda"):
     found_safetensors = list(path_to_model.glob("*.safetensors"))
     pt_path = None
 
-    if len(found_pts) == 1:
+    if len(found_pts) >= 1:
         pt_path = found_pts[0]
-    elif len(found_safetensors) == 1:
+    elif len(found_safetensors) >= 1:
         pt_path = found_safetensors[0]
 
     if not pt_path:
