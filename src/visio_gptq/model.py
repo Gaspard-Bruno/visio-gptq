@@ -68,7 +68,7 @@ class GPTQModel:
 
         len_prompt = len(prompt)
         temperature = float(kwargs.get("temperature") or 0.7)
-        max_new_tokens = int(kwargs.get("max_new_tokens") or 256)
+        max_new_tokens = int(kwargs.get("max_new_tokens") or 2048)
         context_len = int(kwargs.get("context_len") or 2048)
         stream_interval = int(kwargs.get("stream_interval") or 2)
         stop_array = kwargs.get("stop") or ["###"]
@@ -209,3 +209,6 @@ class GPTQModel:
             conversation.messages[-1][-1] = output
             return conversation
         return output
+    
+    def inference(self, prompt: str, **kwargs):
+        return self.generate(prompt, **kwargs)
