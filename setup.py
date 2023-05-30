@@ -8,7 +8,7 @@ subprocess.run(["git", "submodule", "update"])
 # Change directory to submodule
 os.chdir("src/visio_gptq/GPTQ-for-LLaMa")
 # Checkout cuda branch
-subprocess.run(["git", "checkout", "cfcbe9afec9e9b8f586d8ba59bea8b446d736411"])
+subprocess.run(["git", "checkout", "81fe867ae302a057a525e8584c6b927a1ba7b748"])
 # Install requirements
 subprocess.run(["pip", "install", "-r", "requirements.txt"])
 # Install package
